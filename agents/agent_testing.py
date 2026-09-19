@@ -10,10 +10,8 @@ from crawl4ai import AsyncWebCrawler
 
 # 1. Define your desired output schema
 class CompanyAnalysis(BaseModel):
-    company_name: str = Field(description="Name of the company or website")
     core_offering: str = Field(description="Primary product or service offered")
-    key_features: List[str] = Field(description="3-5 key features or services found on the page")
-    target_audience: str = Field(description="Intended audience for this platform")
+    restaurants: List[str] = Field(description="Each restaurant that gives pizza as an option")
 
 # 2. Define the scraping tool
 @tool
@@ -64,7 +62,6 @@ if response.tool_calls:
 
     # 6. Access structured output directly as a Pydantic object or JSON
     print("\n--- Parsed Pydantic Object ---")
-    print(f"Company: {final_output.company_name}")
     print(f"Offering: {final_output.core_offering}")
 
     print("\n--- Raw JSON Dump ---")
