@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusConcierge</title>
+  <style>
+    :root { font-family: Arial, sans-serif; color: #243746; background: #e8eef2; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; overflow: hidden; }
+    .map { position: fixed; inset: 0; display: grid; place-items: center; background: #e8eef2; }
+    .map-label { color: #60727d; font-size: 1.4rem; }
+    .chat-history {
+      position: fixed; inset: 0 0 76px; overflow-y: auto; padding: 24px 16px 16px;
+      background: rgba(255, 255, 255, .97); transform: translateY(100%);
+      transition: transform .25s ease; pointer-events: none;
+    }
+    .chat-history.open { transform: translateY(0); pointer-events: auto; }
+    .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    .history-header h2 { margin: 0; font-size: 1.1rem; }
+    .message { max-width: 82%; padding: 11px 14px; margin: 8px 0; border-radius: 16px; line-height: 1.35; white-space: pre-wrap; }
+    .user { margin-left: auto; color: white; background: #861f41; }
+    .agent { background: #e6edf1; }
+    .composer {
+      position: fixed; z-index: 2; right: 0; bottom: 0; left: 0; display: flex; gap: 8px;
+      align-items: end; padding: 10px 12px; background: #fff; box-shadow: 0 -4px 16px rgba(0,0,0,.12);
+    }
+    textarea { flex: 1; min-height: 46px; max-height: 120px; resize: none; padding: 12px 14px; border: 1px solid #ccd7dd; border-radius: 18px; font: inherit; outline: none; }
+    textarea:focus { border-color: #861f41; }
+    button { border: 0; border-radius: 18px; padding: 12px 16px; font: inherit; cursor: pointer; }
+    .toggle { color: #243746; background: #e9eef2; }
+    .send { color: white; background: #861f41; }
+    .send:disabled { opacity: .45; cursor: not-allowed; }
+    .status { margin: 8px 0; color: #60727d; font-size: .9rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <main class="map" aria-label="Campus map placeholder">
+    <div class="map-label">Map coming soon</div>
+  </main>
+
+  <section id="chatHistory" class="chat-history" aria-label="Conversation history">
+    <div class="history-header">
+      <h2>CampusConcierge</h2>
+      <button id="collapseButton" class="toggle" type="button">Collapse</button>
+    </div>
+    <div id="messages"></div>
+  </section>
+
+  <form id="composer" class="composer">
+    <button id="toggleButton" class="toggle" type="button" aria-label="Expand chat">⌃</button>
+    <textarea id="input" rows="1" placeholder="Ask CampusConcierge..." aria-label="Message"></textarea>
+    <button id="sendButton" class="send" type="submit" disabled>Send</button>
+  </form>
+
+  <script>
+    const history = document.querySelector('#chatHistory');
+    const messages = document.querySelector('#messages');
+    const input = document.querySelector('#input');
+    const sendButton = document.querySelector('#sendButton');
+    const toggleButton = document.querySelector('#toggleButton');
+    const collapseButton = document.querySelector('#collapseButton');
+
+    function setExpanded(expanded) {
+      history.classList.toggle('open', expanded);
+      toggleButton.textContent = expanded ? '⌄' : '⌃';
+      toggleButton.setAttribute('aria-label', expanded ? 'Collapse chat' : 'Expand chat');
+      if (expanded) scrollToBottom();
+    }
+
+    function addMessage(text, role) {
+      const message = document.createElement('div');
+      message.className = `message ${role}`;
+      message.textContent = text;
+      messages.appendChild(message);
+      scrollToBottom();
+    }
+
+    function scrollToBottom() {
+      requestAnimationFrame(() => { history.scrollTop = history.scrollHeight; });
+    }
+
+    input.addEventListener('input', () => {
+      sendButton.disabled = !input.value.trim();
+      input.style.height = 'auto';
+      input.style.height = `${Math.min(input.scrollHeight, 120)}px`;
+    });
+
+    toggleButton.addEventListener('click', () => setExpanded(!history.classList.contains('open')));
+    collapseButton.addEventListener('click', () => setExpanded(false));
+
+    document.querySelector('#composer').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage(text, 'user');
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      setExpanded(true);
+
+      const status = document.createElement('div');
+      status.className = 'status';
+      status.textContent = 'Campus agents are thinking...';
+      messages.appendChild(status);
+      scrollToBottom();
+
+      // Replace this mock response with fetch() when your backend endpoint is ready.
+      // const response = await fetch('http://localhost:8000/api/concierge', {
+      //   method: 'POST', headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ message: text })
+      // });
+      // const data = await response.json();
+
+      await new Promise(resolve => setTimeout(resolve, 700));
+      status.remove();
+      addMessage('I received your request. Agent responses will appear here.', 'agent');
+    });
+  </script>
+</body>
+</html>
