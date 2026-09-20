@@ -1,51 +1,37 @@
 {
-  "dataAsOf": "REPLACE-WITH-DATE-YOU-COLLECTED-IT",
-  "isSample": true,
+  "dataAsOf": "2026-09-20",
+  "isSample": false,
   "items": [
     {
-      "title": "EXAMPLE bus route #1 - replace with a real one + real lat/lng",
-      "detail": "Replace with a real description from a public official source.",
-      "when": "Replace with real hours or date",
-      "where": "Replace with real location",
-      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "title": "CAS - Campus Shuttle",
+      "detail": "Campus Shuttle service operates around central campus via West Campus Drive, Washington Street, Kent Street, and Stanger Street.",
+      "when": "Service varies by time of day and day of week; check the official schedule.",
+      "where": "Central Virginia Tech campus",
+      "sourceUrl": "https://ridebt.org/schedules",
       "costUsd": null,
-      "tags": [
-        "bus",
-        "campus",
-        "route"
-      ],
-      "lat": 37.2269,
-      "lng": -80.4249
+      "tags": ["bus", "transit", "campus shuttle", "CAS", "central campus"],
+      "lat": 37.2296,
+      "lng": -80.4264
     },
     {
-      "title": "EXAMPLE bus route #2 - replace with a real one + real lat/lng",
-      "detail": "Replace with a real description from a public official source.",
-      "when": "Replace with real hours or date",
-      "where": "Replace with real location",
-      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
-      "costUsd": null,
-      "tags": [
-        "bus",
-        "town",
-        "route"
-      ],
-      "lat": 37.2284,
-      "lng": -80.4234
+      "title": "HXS - Hokie Express Stanger",
+      "detail": "Hokie Express Stanger serves Oak Lane, Duckpond Drive, West Campus Drive, and Stanger Street to the Orange and Maroon Loops.",
+      "when": "This route operates when HXP is not in service; check the official schedule.",
+      "where": "Virginia Tech campus loops",
+      "sourceUrl": "https://ridebt.org/schedules",
+      "tags": ["bus", "transit", "Hokie Express", "HXS", "campus"],
+      "lat": 37.2296,
+      "lng": -80.4264
     },
     {
-      "title": "EXAMPLE bus route #3 - replace with a real one + real lat/lng",
-      "detail": "Replace with a real description from a public official source.",
-      "when": "Replace with real hours or date",
-      "where": "Replace with real location",
-      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
-      "costUsd": null,
-      "tags": [
-        "late",
-        "night",
-        "bus"
-      ],
-      "lat": 37.2299,
-      "lng": -80.4219
+      "title": "TCP - Toms Creek Progress",
+      "detail": "Toms Creek Progress provides service along Toms Creek Road, Broce Drive, Progress Street, Patrick Henry Drive, and University City Boulevard to the Orange Loop.",
+      "when": "Service varies by time of day and day of week; check the official schedule.",
+      "where": "Orange Loop, Virginia Tech campus",
+      "sourceUrl": "https://ridebt.org/schedules",
+      "tags": ["bus", "transit", "TCP", "Toms Creek", "Orange Loop"],
+      "lat": 37.2300,
+      "lng": -80.4255
     }
   ]
 }

@@ -1,51 +1,39 @@
 {
-  "dataAsOf": "REPLACE-WITH-DATE-YOU-COLLECTED-IT",
-  "isSample": true,
+  "dataAsOf": "2026-09-20",
+  "isSample": false,
   "items": [
     {
-      "title": "EXAMPLE dining option #1 - replace with a real one + real lat/lng",
-      "detail": "Replace with a real description from a public official source.",
-      "when": "Replace with real hours or date",
-      "where": "Replace with real location",
-      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
-      "costUsd": 6,
-      "tags": [
-        "cheap",
-        "lunch",
-        "food"
-      ],
-      "lat": 37.2269,
-      "lng": -80.4249
+      "title": "Dietrick Hall / Deet's Place",
+      "detail": "Dietrick Hall includes Deet's Place, coffee, vegan options, allergen-friendly choices, D2, and multiple dining concepts.",
+      "when": "Check current hours and menu before visiting.",
+      "where": "Dietrick Hall, Virginia Tech campus",
+      "sourceUrl": "https://dining.vt.edu/dining_centers/dietrick-hall.html",
+      "costUsd": null,
+      "tags": ["food", "dining", "coffee", "vegan", "vegetarian", "allergen-friendly", "campus"],
+      "lat": 37.22775,
+      "lng": -80.42315
     },
     {
-      "title": "EXAMPLE dining option #2 - replace with a real one + real lat/lng",
-      "detail": "Replace with a real description from a public official source.",
-      "when": "Replace with real hours or date",
-      "where": "Replace with real location",
-      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
-      "costUsd": 9,
-      "tags": [
-        "dinner",
-        "food",
-        "hot"
-      ],
-      "lat": 37.2284,
-      "lng": -80.4234
+      "title": "Turner Place at Lavery Hall",
+      "detail": "Turner Place offers breakfast through dessert, including Peet's Coffee, crepes, pizza, bagels, smoothies, sushi, bowls, and salads.",
+      "when": "Check current hours and menu before visiting.",
+      "where": "Lavery Hall, Virginia Tech campus",
+      "sourceUrl": "https://dining.vt.edu/dining_centers/turner.html",
+      "costUsd": null,
+      "tags": ["food", "dining", "coffee", "vegetarian", "pizza", "bagels", "smoothies", "sushi", "salad", "campus"],
+      "lat": 37.22925,
+      "lng": -80.42365
     },
     {
-      "title": "EXAMPLE dining option #3 - replace with a real one + real lat/lng",
-      "detail": "Replace with a real description from a public official source.",
-      "when": "Replace with real hours or date",
-      "where": "Replace with real location",
-      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
-      "costUsd": 0,
-      "tags": [
-        "free",
-        "snack",
-        "food"
-      ],
-      "lat": 37.2299,
-      "lng": -80.4219
+      "title": "West End at Cochrane Hall",
+      "detail": "West End includes smoothies and acai bowls, Peet's Coffee, salads, Asian bowls, pizza, sandwiches, wraps, quesadillas, and vegetarian options.",
+      "when": "Check current hours and menu before visiting.",
+      "where": "Cochrane Hall, Virginia Tech campus",
+      "sourceUrl": "https://dining.vt.edu/dining_centers/west_end.html",
+      "costUsd": null,
+      "tags": ["food", "dining", "coffee", "vegetarian", "smoothies", "acai", "salad", "pizza", "sandwich", "campus"],
+      "lat": 37.22675,
+      "lng": -80.42735
     }
   ]
 }
