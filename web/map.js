@@ -1,9 +1,18 @@
 // CampusConcierge Google Maps initialization
 
+
 const VIRGINIA_TECH = {
   lat: 37.2296,
   lng: -80.4264
 };
+
+(function () {
+  const script = document.createElement("script");
+  script.src =
+    "https://maps.googleapis.com/maps/api/js?key=AIzaSyBB1KdfAYLCo-tgcG-lABhrHkw2tQzB42A&loading=async&callback=initMap";
+  script.async = true;
+  document.head.appendChild(script);
+})();
 
 function initMap() {
   const mapElement = document.getElementById("map");
