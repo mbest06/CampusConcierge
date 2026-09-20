@@ -68,8 +68,7 @@ function initMap() {
       window.userLocationMarker = new google.maps.Marker({
         map,
         position: userLocation,
-        title: "Your location",
-        label: "You"
+        title: "Your location"
       });
     },
     (error) => {
