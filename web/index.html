@@ -7,11 +7,14 @@
   <style>
     :root { font-family: Arial, sans-serif; color: #243746; background: #e8eef2; }
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body { margin: 0; min-height: 100vh; overflow: hidden; }
-    .map { position: fixed; inset: 0; display: grid; place-items: center; background: #e8eef2; }
-    .map-label { color: #60727d; font-size: 1.4rem; }
+
+    .map { position: fixed; inset: 0; background: #e8eef2; }
+    #map { width: 100%; height: 100%; }
+
     .chat-history {
-      position: fixed; inset: 0 0 76px; overflow-y: auto; padding: 24px 16px 16px;
+      position: fixed; z-index: 1; inset: 0 0 76px; overflow-y: auto; padding: 24px 16px 16px;
       background: rgba(255, 255, 255, .97); transform: translateY(100%);
       transition: transform .25s ease; pointer-events: none;
     }
@@ -21,6 +24,7 @@
     .message { max-width: 82%; padding: 11px 14px; margin: 8px 0; border-radius: 16px; line-height: 1.35; white-space: pre-wrap; }
     .user { margin-left: auto; color: white; background: #861f41; }
     .agent { background: #e6edf1; }
+
     .composer {
       position: fixed; z-index: 2; right: 0; bottom: 0; left: 0; display: flex; gap: 8px;
       align-items: end; padding: 10px 12px; background: #fff; box-shadow: 0 -4px 16px rgba(0,0,0,.12);
@@ -35,8 +39,9 @@
   </style>
 </head>
 <body>
-  <main class="map" aria-label="Campus map placeholder">
-    <div class="map-label">Map coming soon</div>
+  <main class="map" aria-label="Interactive campus map">
+    <!-- Your teammate's map JavaScript should initialize this element. -->
+    <div id="map"></div>
   </main>
 
   <section id="chatHistory" class="chat-history" aria-label="Conversation history">
@@ -105,17 +110,13 @@
       messages.appendChild(status);
       scrollToBottom();
 
-      // Replace this mock response with fetch() when your backend endpoint is ready.
-      // const response = await fetch('http://localhost:8000/api/concierge', {
-      //   method: 'POST', headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ message: text })
-      // });
-      // const data = await response.json();
-
+      // Replace this mock section with your backend fetch when it is ready.
       await new Promise(resolve => setTimeout(resolve, 700));
       status.remove();
       addMessage('I received your request. Agent responses will appear here.', 'agent');
     });
   </script>
+  <script src="./map.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&loading=async&callback=initMap"></script>
 </body>
 </html>
