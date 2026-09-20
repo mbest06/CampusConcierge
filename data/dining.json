@@ -1,0 +1,51 @@
+{
+  "dataAsOf": "REPLACE-WITH-DATE-YOU-COLLECTED-IT",
+  "isSample": true,
+  "items": [
+    {
+      "title": "EXAMPLE dining option #1 - replace with a real one + real lat/lng",
+      "detail": "Replace with a real description from a public official source.",
+      "when": "Replace with real hours or date",
+      "where": "Replace with real location",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 6,
+      "tags": [
+        "cheap",
+        "lunch",
+        "food"
+      ],
+      "lat": 37.2269,
+      "lng": -80.4249
+    },
+    {
+      "title": "EXAMPLE dining option #2 - replace with a real one + real lat/lng",
+      "detail": "Replace with a real description from a public official source.",
+      "when": "Replace with real hours or date",
+      "where": "Replace with real location",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 9,
+      "tags": [
+        "dinner",
+        "food",
+        "hot"
+      ],
+      "lat": 37.2284,
+      "lng": -80.4234
+    },
+    {
+      "title": "EXAMPLE dining option #3 - replace with a real one + real lat/lng",
+      "detail": "Replace with a real description from a public official source.",
+      "when": "Replace with real hours or date",
+      "where": "Replace with real location",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 0,
+      "tags": [
+        "free",
+        "snack",
+        "food"
+      ],
+      "lat": 37.2299,
+      "lng": -80.4219
+    }
+  ]
+}
