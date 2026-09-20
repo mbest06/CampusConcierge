@@ -1,0 +1,51 @@
+{
+  "dataAsOf": "REPLACE-WITH-DATE-YOU-COLLECTED-IT",
+  "isSample": true,
+  "items": [
+    {
+      "title": "EXAMPLE bus route #1 - replace with a real one + real lat/lng",
+      "detail": "Replace with a real description from a public official source.",
+      "when": "Replace with real hours or date",
+      "where": "Replace with real location",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "campus",
+        "route"
+      ],
+      "lat": 37.2269,
+      "lng": -80.4249
+    },
+    {
+      "title": "EXAMPLE bus route #2 - replace with a real one + real lat/lng",
+      "detail": "Replace with a real description from a public official source.",
+      "when": "Replace with real hours or date",
+      "where": "Replace with real location",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "town",
+        "route"
+      ],
+      "lat": 37.2284,
+      "lng": -80.4234
+    },
+    {
+      "title": "EXAMPLE bus route #3 - replace with a real one + real lat/lng",
+      "detail": "Replace with a real description from a public official source.",
+      "when": "Replace with real hours or date",
+      "where": "Replace with real location",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "late",
+        "night",
+        "bus"
+      ],
+      "lat": 37.2299,
+      "lng": -80.4219
+    }
+  ]
+}
