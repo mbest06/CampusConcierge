@@ -19,5 +19,5 @@ web/node_modules/
 .next/
 web/.next/
 .env*.local
-
+.env
 
