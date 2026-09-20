@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 
 from langchain_core.messages import HumanMessage, ToolMessage
 from langchain_core.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 from crawl4ai import AsyncWebCrawler
 
 # Enforce the target URL across all runs
@@ -31,12 +31,12 @@ def scrape_website_content(url: str = TARGET_URL) -> str:
 
     return asyncio.run(_fetch())
 
-# 3. Setup Gemini Model
-os.environ["GOOGLE_API_KEY"] = "AQ.Ab8RN6KH6lhUoFwu5aWfq0hsTnf7sNOsX8jekHnjJobv-0SPsA"
+# 3. Setup Groq Model (requires: pip install langchain-groq)
+os.environ["GROQ_API_KEY"] = "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"
 
-base_llm = ChatGoogleGenerativeAI(
-    model="gemini-3.6-flash",
-    http_options={"api_version": "v1"}
+base_llm = ChatGroq(
+    model="llama-prompt-guard-2-86m",
+    temperature=0
 )
 
 llm_with_tools = base_llm.bind_tools([scrape_website_content])

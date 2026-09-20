@@ -10,7 +10,7 @@ from langchain_groq import ChatGroq
 from crawl4ai import AsyncWebCrawler
 
 # Target Transit URL (Blacksburg Transit / VT Bus routes)
-TARGET_URL = "https://ridebt.org/routes"
+TARGET_URL = "https://ridebt.org/routes-schedules"
 
 # 1. Output Schema for Bus Transit Agent Inter-Agent Consumption
 class AgentBusRouteResponse(BaseModel):
@@ -32,10 +32,10 @@ def scrape_bus_routes(url: str = TARGET_URL) -> str:
     return asyncio.run(_fetch())
 
 # 3. Setup Groq Model (requires: pip install langchain-groq)
-os.environ["GROQ_API_KEY"] = "YOUR_GROQ_API_KEY_HERE"
+os.environ["GROQ_API_KEY"] = "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"
 
 base_llm = ChatGroq(
-    model="llama-3.3-70b-versatile",
+    model="llama-prompt-guard-2-86m",
     temperature=0
 )
 
