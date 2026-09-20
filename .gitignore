@@ -13,8 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-<<<<<<< HEAD
-=======
 .env.local
 node_modules/
 web/node_modules/
@@ -23,4 +21,3 @@ web/.next/
 .env*.local
 
 
->>>>>>> 2b061fbf5adc45f9c4297937aee3ce0230ecc5a4
