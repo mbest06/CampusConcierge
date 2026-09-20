@@ -22,7 +22,7 @@ export type VerifyResult = {
   checkedAt: string;
 };
 
-const YOUR_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? "yourdomain.xyz"; // TODO: set to your GoDaddy domain
+const YOUR_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? "campusconcierge-self.vercel.app"; // TODO: set to your GoDaddy domain
 
 // Locally each agent runs on its own port. On Vultr, set AGENT_URL_DINING etc. to the real URLs.
 function endpointFor(id: string, port: number): string {
