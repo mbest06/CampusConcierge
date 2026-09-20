@@ -68,7 +68,12 @@ function initMap() {
       window.userLocationMarker = new google.maps.Marker({
         map,
         position: userLocation,
-        title: "Your location"
+        title: "Your location",
+        icon: {
+          url: "pin.svg", // or data URI
+          scaledSize: new google.maps.Size(32, 32),
+          anchor: new google.maps.Point(16, 32) // bottom center
+        }
       });
     },
     (error) => {
