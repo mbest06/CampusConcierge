@@ -6,6 +6,13 @@ const VIRGINIA_TECH = {
   lng: -80.4264
 };
 
+const BOUNDS = {
+  north: 37.26,
+  south: 37.16,
+  east: -80.39,
+  west: -80.45
+};
+
 (function () {
   const script = document.createElement("script");
   script.src =
@@ -25,6 +32,11 @@ function initMap() {
   const map = new google.maps.Map(mapElement, {
     center: VIRGINIA_TECH,
     zoom: 16,
+    mapId: "9cbe5199cbcc608c4302f8a8",
+    restriction: {
+      latLngBounds: BOUNDS,
+      strictBounds: true,
+    },
     mapTypeControl: false,
     streetViewControl: false,
     fullscreenControl: true,
