@@ -1,0 +1,82 @@
+{
+  "dataAsOf": "REPLACE-WITH-DATE-YOU-COLLECTED-IT",
+  "isSample": true,
+  "items": [
+    {
+      "title": "EXAMPLE campus bus stop A - replace me",
+      "detail": "Replace: which routes stop here",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "stop",
+        "campus"
+      ],
+      "lat": 37.2258,
+      "lng": -80.4247
+    },
+    {
+      "title": "EXAMPLE campus bus stop B - replace me",
+      "detail": "Replace: which routes stop here",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "stop",
+        "campus"
+      ],
+      "lat": 37.2271,
+      "lng": -80.4236
+    },
+    {
+      "title": "EXAMPLE downtown bus stop - replace me",
+      "detail": "Replace: which routes stop here",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "stop",
+        "town",
+        "downtown"
+      ],
+      "lat": 37.2284,
+      "lng": -80.4225
+    },
+    {
+      "title": "EXAMPLE library bus stop - replace me",
+      "detail": "Replace: which routes stop here",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "stop",
+        "library"
+      ],
+      "lat": 37.2297,
+      "lng": -80.4214
+    },
+    {
+      "title": "EXAMPLE late-night route stop - replace me",
+      "detail": "Replace: which routes stop here",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": null,
+      "tags": [
+        "bus",
+        "late",
+        "night"
+      ],
+      "lat": 37.231,
+      "lng": -80.4203
+    }
+  ]
+}

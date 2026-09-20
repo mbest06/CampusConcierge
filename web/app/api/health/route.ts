@@ -1,18 +1,13 @@
-// GET /api/health - open this URL in the PHONE's browser to prove the phone can reach the backend.
+// Open /api/health to check the server is up and each agent loaded its data.
 import { AGENTS } from "@/lib/registry";
-import { json, optionsResponse } from "@/lib/cors";
 
-export const runtime = "nodejs";
-
-export async function OPTIONS() {
-  return optionsResponse();
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return json({
+  return Response.json({
     ok: true,
-    service: "hokie-concierge",
-    agents: AGENTS.map((a) => ({ id: a.id, name: a.name })),
-    time: new Date().toISOString(),
+    geminiKeySet: Boolean(process.env.GEMINI_API_KEY),
+    atlasConfigured: Boolean(process.env.MONGODB_URI),
+    agents: AGENTS.map((a) => ({ id: a.id, name: a.name, rows: a.data.items.length, isSample: a.data.isSample })),
   });
 }

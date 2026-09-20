@@ -1,0 +1,81 @@
+{
+  "dataAsOf": "REPLACE-WITH-DATE-YOU-COLLECTED-IT",
+  "isSample": true,
+  "items": [
+    {
+      "title": "EXAMPLE cheap lunch spot - replace me",
+      "detail": "Replace with a real dining option",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 6,
+      "tags": [
+        "cheap",
+        "lunch",
+        "food"
+      ],
+      "lat": 37.2258,
+      "lng": -80.4256
+    },
+    {
+      "title": "EXAMPLE dinner spot - replace me",
+      "detail": "Replace with a real dining option",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 9,
+      "tags": [
+        "dinner",
+        "food",
+        "hot"
+      ],
+      "lat": 37.2271,
+      "lng": -80.4245
+    },
+    {
+      "title": "EXAMPLE free snack - replace me",
+      "detail": "Replace with a real free or low-cost food option",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 0,
+      "tags": [
+        "free",
+        "snack",
+        "food"
+      ],
+      "lat": 37.2284,
+      "lng": -80.4234
+    },
+    {
+      "title": "EXAMPLE coffee stop - replace me",
+      "detail": "Replace with a real coffee spot",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 4,
+      "tags": [
+        "coffee",
+        "cheap",
+        "morning"
+      ],
+      "lat": 37.2297,
+      "lng": -80.4223
+    },
+    {
+      "title": "EXAMPLE late-night bite - replace me",
+      "detail": "Replace with a real late-night option",
+      "when": "REPLACE: real hours or times from the official page",
+      "where": "REPLACE: real building or stop",
+      "sourceUrl": "https://REPLACE-WITH-OFFICIAL-SOURCE",
+      "costUsd": 8,
+      "tags": [
+        "late",
+        "night",
+        "food"
+      ],
+      "lat": 37.231,
+      "lng": -80.4212
+    }
+  ]
+}

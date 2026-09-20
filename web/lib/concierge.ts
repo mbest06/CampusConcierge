@@ -1,106 +1,160 @@
-// The concierge brain, extracted so BOTH routes can use it:
-//   /api/concierge       -> streams events (Server-Sent Events)
-//   /api/concierge-json  -> returns all events at once (easiest for the mobile app)
-//
-// Events emitted, in order:
-//   plan          which agents Gemini chose
-//   verify        one per chosen agent: identity check result (status: verified | unverified | mock)
-//   agent_result  one per agent that answered (or failed / timed out); data.results[] may include lat/lng
-//   final         the written answer + which agents were used
-//   error         something broke (message included)
-//
-// Person A: this file is yours. Tune the two prompts and test with realistic questions.
+// THE MAIN AGENT. It never answers from its own knowledge. It:
+//   1. PLANS   - asks Gemini which specialist agents are needed
+//   2. VERIFIES - checks each agent's identity (mock unless you build a real ANS check)
+//   3. ASKS    - sends each specialist a request over HTTP (agent-to-agent communication)
+//   4. ANSWERS - asks Gemini to write one reply using ONLY what the specialists returned
+// Every step is written to `trace` so the page can SHOW the agents talking to each other.
 import { AGENTS, getAgent, verifyAgent } from "@/lib/registry";
 import { askGeminiJSON, askGeminiText } from "@/lib/gemini";
-
-export type Emit = (event: string, data: unknown) => void;
+import { searchData } from "@/lib/agentRuntime";
+import type { AgentResponse, AgentStatus, AskResult, Pin, TraceStep } from "@/lib/types";
 
 type PlannedCall = { agent: string; intent: string; params?: Record<string, unknown> };
 type Plan = { calls: PlannedCall[] };
 
-const AGENT_TIMEOUT_MS = 3000;
+// If an agent's HTTP call is slower than this (or fails), the main agent falls back to asking the
+// agent's data directly, so the demo never dies. The trace says so plainly when that happens.
+const AGENT_TIMEOUT_MS = 4000;
 
-export type ConciergeOptions = { location?: { lat: number; lng: number } };
+export async function runConcierge(question: string, origin: string): Promise<AskResult> {
+  const trace: TraceStep[] = [];
+  const agents: AgentStatus[] = [];
+  const pins: Pin[] = [];
+  let isSample = false;
 
-export async function runConcierge(
-  question: string,
-  send: Emit,
-  opts: ConciergeOptions = {}
-): Promise<void> {
   try {
-    // 1) PLAN: ask Gemini which agents to use.
-    const catalog = AGENTS.map((a) => ({
-      id: a.id,
-      description: a.description,
-      capabilities: a.capabilities,
-    }));
+    // ---- 1. PLAN -----------------------------------------------------------
+    const catalog = AGENTS.map((a) => ({ id: a.id, description: a.description, capabilities: a.capabilities }));
     const planPrompt = `You route student questions for a Virginia Tech campus assistant.
 Available agents (JSON): ${JSON.stringify(catalog)}
 Student question: "${question}"
 
 Reply ONLY with JSON in this exact shape:
-{"calls":[{"agent":"<agent id>","intent":"<short phrase describing what to look up>","params":{"budget":<number or omit>,"minutes":<number or omit>}}]}
-Choose 1 or 2 agents (use both when the question needs food AND a bus). Use only agent ids from the list. If no agent fits, reply {"calls":[]}.`;
+{"calls":[{"agent":"<agent id>","intent":"<short phrase describing what to look up>","params":{"budget":<number or omit>}}]}
+Choose 1 or 2 agents (use both when the question needs food AND a bus). Use only agent ids from the list.
+If no agent fits, reply {"calls":[]}.`;
 
     const plan = await askGeminiJSON<Plan>(planPrompt);
     const calls = (plan.calls ?? []).filter((c) => getAgent(c.agent)).slice(0, 2);
-    send("plan", { calls });
+    trace.push({
+      from: "main",
+      to: "main",
+      kind: "plan",
+      text: calls.length
+        ? `Plan: ask ${calls.map((c) => c.agent).join(" and ")}`
+        : "Plan: no specialist agent fits this question",
+    });
 
-    // 2) VERIFY: check each chosen agent's identity before calling it.
-    const verified: PlannedCall[] = [];
+    // ---- 2. VERIFY ---------------------------------------------------------
+    const toCall: PlannedCall[] = [];
     for (const call of calls) {
-      const agent = getAgent(call.agent)!;
-      const result = await verifyAgent(agent);
-      send("verify", result);
-      if (result.status !== "unverified") verified.push(call);
+      const info = getAgent(call.agent)!;
+      const check = await verifyAgent(info);
+      agents.push({
+        id: info.id,
+        name: info.name,
+        status: check.status,
+        publisher: check.note,
+        answered: null,
+        error: null,
+      });
+      trace.push({ from: "main", to: info.id, kind: "verify", text: check.note });
+      if (check.status !== "unverified") toCall.push(call);
     }
 
-    // 3) CALL the verified agents in parallel, each with a short timeout.
-    const results = await Promise.all(
-      verified.map(async (call) => {
-        const agent = getAgent(call.agent)!;
+    // ---- 3. ASK the specialists (in parallel) ------------------------------
+    const replies = await Promise.all(
+      toCall.map(async (call) => {
+        const info = getAgent(call.agent)!;
+        const status = agents.find((a) => a.id === info.id)!;
+        trace.push({ from: "main", to: info.id, kind: "request", text: call.intent });
+        const params = { ...(call.params ?? {}), question };
+
+        let data: AgentResponse;
+        let note = "";
         try {
-          const res = await fetch(`${agent.endpoint}/query`, {
+          // The real thing: an HTTP request from the main agent to the specialist agent.
+          const res = await fetch(`${origin}${info.path}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              intent: call.intent,
-              params: { ...(call.params ?? {}), question, ...(opts.location ? { location: opts.location } : {}) },
-            }),
+            body: JSON.stringify({ intent: call.intent, params }),
             signal: AbortSignal.timeout(AGENT_TIMEOUT_MS),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-          send("agent_result", { agent: agent.id, ok: true, data });
-          return { agent: agent.id, data };
-        } catch (err) {
-          send("agent_result", { agent: agent.id, ok: false, error: String(err) });
-          return null;
+          data = (await res.json()) as AgentResponse;
+        } catch (httpErr) {
+          // Safety net: ask the agent's own data directly, and SAY SO in the trace.
+          try {
+            data = searchData(info.data, info.id, call.intent, params);
+            note = ` (answered locally: HTTP call failed - ${String(httpErr).slice(0, 60)})`;
+          } catch (localErr) {
+            status.answered = false;
+            status.error = String(localErr);
+            trace.push({ from: info.id, to: "main", kind: "error", text: `no answer (${String(localErr)})` });
+            return null;
+          }
         }
+        status.answered = true;
+        trace.push({ from: info.id, to: "main", kind: "response", text: `${data.results.length} result(s)${note}` });
+        return data;
       })
     );
-    const good = results.filter(Boolean);
+    const good = replies.filter((r): r is AgentResponse => r !== null);
 
-    // 4) ANSWER: Gemini writes the reply using ONLY what the agents returned.
-    const locationNote = opts.location
-      ? "- The student shared their location, so results are ordered nearest first when they have coordinates.\n"
-      : "";
-    const answerPrompt = `You are Hokie Concierge, a friendly assistant for Virginia Tech students, shown inside a phone app with a map.
+    // Collect map pins and the sample-data flag.
+    for (const r of good) {
+      if (r.isSample) isSample = true;
+      r.results.forEach((item, i) => {
+        if (typeof item.lat === "number" && typeof item.lng === "number") {
+          pins.push({
+            id: `${r.agent}-${i}`,
+            agent: r.agent,
+            title: item.title,
+            detail: item.detail,
+            when: item.when,
+            where: item.where,
+            sourceUrl: item.sourceUrl,
+            lat: item.lat,
+            lng: item.lng,
+            distanceKm: null,
+          });
+        }
+      });
+    }
+
+    // ---- 4. ANSWER ---------------------------------------------------------
+    const answerPrompt = `You are Hokie Concierge, a friendly assistant for Virginia Tech students.
 Student question: "${question}"
 
-Data returned by campus agents (JSON): ${JSON.stringify(good)}
+Data returned by your specialist agents (JSON): ${JSON.stringify(good)}
 
 Rules:
 - Use ONLY the data above. Never invent hours, prices, places, or events.
 - Include times and locations when the data has them.
-${locationNote}- If any result has "isSample": true, say the info is sample data and should be double-checked.
+- If any result has "isSample": true, say the info is sample data and should be double-checked.
+- When both a dining result and a transit result are present, connect them: what to eat, where it is, and which bus/stop helps.
 - If the data does not answer the question, say you don't know and suggest checking official Virginia Tech sources.
-- When both a dining result and a transit result are present, connect them: say what to eat, where it is, and which bus/stop helps.
-- Keep it short, warm, and easy to read on a phone (a few short lines, no long paragraphs).`;
+- Keep it short, warm, and easy to scan (a few short lines, no long paragraphs).`;
 
     const answer = await askGeminiText(answerPrompt);
-    send("final", { answer, usedAgents: good.map((g) => g!.agent) });
+    return {
+      answer,
+      usedAgents: good.map((g) => g.agent),
+      agents,
+      pins,
+      trace,
+      isSample,
+      error: null,
+    };
   } catch (err) {
-    send("error", { message: err instanceof Error ? err.message : String(err) });
+    return {
+      answer: "",
+      usedAgents: [],
+      agents,
+      pins,
+      trace,
+      isSample,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }

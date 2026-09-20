@@ -1,66 +1,47 @@
-// The list of agents the concierge can use, plus the identity check.
+// The list of agents the MAIN agent can talk to, plus the identity check.
 //
-// Person C: replace the body of verifyAgent() with a REAL ANS check once an agent is registered.
-// Until then it returns status "mock". The UI must show "mock" honestly (never a green "verified"
-// badge for a mock result) - judges will ask.
+// verifyAgent() is a MOCK. It returns "mock" and the page shows it in gray, honestly.
+// If a GoDaddy ANS mentor gives you a quick way to do a real check, replace the body below.
+import diningRaw from "@/data/dining.json";
+import transitRaw from "@/data/transit.json";
+import { normalizeData } from "@/lib/agentRuntime";
+import type { DataFile } from "@/lib/types";
 
-export type AnsStatus = "verified" | "unverified" | "mock";
-
-export type AgentRecord = {
+export type AgentInfo = {
   id: string;
   name: string;
   description: string;
   capabilities: string[];
-  endpoint: string; // base URL of the agent's FastAPI service
-  domain: string; // the agent's subdomain, e.g. dining.yourdomain.xyz
+  path: string; // where the agent lives inside this app (the main agent calls it over HTTP)
+  data: DataFile; // the agent's own data (also used as a safety net if the HTTP call fails)
 };
 
-export type VerifyResult = {
-  agentId: string;
-  status: AnsStatus;
-  publisher: string;
-  checkedAt: string;
-};
-
-const YOUR_DOMAIN = process.env.NEXT_PUBLIC_APP_DOMAIN ?? "campusconcierge-self.vercel.app"; // TODO: set to your GoDaddy domain
-
-// Locally each agent runs on its own port. On Vultr, set AGENT_URL_DINING etc. to the real URLs.
-function endpointFor(id: string, port: number): string {
-  return process.env[`AGENT_URL_${id.toUpperCase()}`] ?? `http://127.0.0.1:${port}`;
-}
-
-export const AGENTS: AgentRecord[] = [
+export const AGENTS: AgentInfo[] = [
   {
     id: "dining",
     name: "Dining Scout",
     description: "Finds campus dining options by budget, time of day, and hours.",
     capabilities: ["cheap_food_now", "dining_hours"],
-    endpoint: endpointFor("dining", 8001),
-    domain: `dining.${YOUR_DOMAIN}`,
+    path: "/api/agents/dining",
+    data: normalizeData(diningRaw),
   },
   {
     id: "transit",
     name: "Transit Guide",
-    description: "Finds bus routes and schedules around campus and town.",
-    capabilities: ["routes", "next_bus"],
-    endpoint: endpointFor("transit", 8002),
-    domain: `transit.${YOUR_DOMAIN}`,
+    description: "Finds bus stops and routes around campus and town.",
+    capabilities: ["routes", "stops"],
+    path: "/api/agents/transit",
+    data: normalizeData(transitRaw),
   },
 ];
 
-export function getAgent(id: string): AgentRecord | undefined {
+export function getAgent(id: string): AgentInfo | undefined {
   return AGENTS.find((a) => a.id === id);
 }
 
-// MOCK implementation. Same shape the real one will return, so nothing else has to change.
-export async function verifyAgent(agent: AgentRecord): Promise<VerifyResult> {
-  // TODO(Person C): call the real ANS verification for agent.domain and map the result:
-  //   verified   -> status "verified", publisher from the certificate/registry
-  //   failed     -> status "unverified"
-  return {
-    agentId: agent.id,
-    status: "mock",
-    publisher: "Hokie Concierge team (MOCK - not ANS)",
-    checkedAt: new Date().toISOString(),
-  };
+export async function verifyAgent(
+  agent: AgentInfo
+): Promise<{ status: "verified" | "unverified" | "mock"; note: string }> {
+  // TODO (only if you get a real ANS check working): call it here and return "verified" / "unverified".
+  return { status: "mock", note: `identity check for ${agent.name} is a MOCK (not real ANS)` };
 }
