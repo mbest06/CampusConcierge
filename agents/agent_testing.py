@@ -1,5 +1,6 @@
 import asyncio
 import os
+import json
 from typing import List
 from pydantic import BaseModel, Field
 
@@ -8,25 +9,29 @@ from langchain_core.tools import tool
 from langchain_google_genai import ChatGoogleGenerativeAI
 from crawl4ai import AsyncWebCrawler
 
-# 1. Define your desired output schema
-class CompanyAnalysis(BaseModel):
-    company_name: str = Field(description="Name of the company or website")
-    core_offering: str = Field(description="Primary product or service offered")
-    key_features: List[str] = Field(description="3-5 key features or services found on the page")
-    target_audience: str = Field(description="Intended audience for this platform")
+# Enforce the target URL across all runs
+TARGET_URL = "https://foodpro.students.vt.edu/menus/"
 
-# 2. Define the scraping tool
+# 1. Output Schema designed for Inter-Agent Consumption
+class AgentMenuResponse(BaseModel):
+    query: str = Field(description="The original question passed in by the requesting agent.")
+    direct_answer: str = Field(description="A concise answer addressing the calling agent's query.")
+    extracted_items: List[str] = Field(description="List of relevant items, menu options, or restaurants extracted.")
+    context_summary: str = Field(description="A brief summary of what was found on the scraped page.")
+
+# 2. Define the scraping tool (bound to TARGET_URL)
 @tool
-def scrape_website_content(url: str) -> str:
-    "Scrapes a web page and returns clean markdown text content."
+def scrape_website_content(url: str = TARGET_URL) -> str:
+    "Scrapes the VT FoodPro menu web page and returns clean markdown text content."
     async def _fetch():
         async with AsyncWebCrawler() as crawler:
-            result = await crawler.arun(url=url)
+            # Force target URL regardless of incoming arguments
+            result = await crawler.arun(url=TARGET_URL)
             return result.markdown[:4000]
 
     return asyncio.run(_fetch())
 
-# 3. Setup Gemini model using gemini-3.6-flash
+# 3. Setup Gemini Model
 os.environ["GOOGLE_API_KEY"] = "AQ.Ab8RN6KH6lhUoFwu5aWfq0hsTnf7sNOsX8jekHnjJobv-0SPsA"
 
 base_llm = ChatGoogleGenerativeAI(
@@ -34,38 +39,43 @@ base_llm = ChatGoogleGenerativeAI(
     http_options={"api_version": "v1"}
 )
 
-# LLM for tool decision
 llm_with_tools = base_llm.bind_tools([scrape_website_content])
+structured_llm = base_llm.with_structured_output(AgentMenuResponse)
 
-# LLM for structured output parsing
-structured_llm = base_llm.with_structured_output(CompanyAnalysis)
+# 4. Agent Function Wrapper
+def process_agent_query(incoming_query: str) -> dict:
+    """
+    Receives a query string from another agent, scrapes the target menu site,
+    and returns a structured dictionary for the caller to ingest directly.
+    """
+    prompt = (
+        f"The user/agent is asking: '{incoming_query}'. "
+        f"You must scrape {TARGET_URL} to find the accurate answer."
+    )
+    
+    messages = [HumanMessage(content=prompt)]
 
-# 4. Step 1: Ask the agent a question
-query = "Can you read https://foodpro.students.vt.edu/menus/ and summarize what they offer?"
-messages = [HumanMessage(content=query)]
+    # Step 1: Tool execution determination
+    response = llm_with_tools.invoke(messages)
+    messages.append(response)
 
-# Model determines if it needs to scrape
-response = llm_with_tools.invoke(messages)
-messages.append(response)
+    # Step 2: Tool execution & Context gathering
+    if response.tool_calls:
+        tool_call = response.tool_calls[0]
 
-# 5. Step 2: If the model chose to scrape, run the tool and format the final response
-if response.tool_calls:
-    tool_call = response.tool_calls[0]
-    print(f"Executing Tool: {tool_call['name']}...")
+        # Execute scrape strictly for TARGET_URL
+        scraped_data = scrape_website_content.invoke({"url": TARGET_URL})
+        messages.append(ToolMessage(content=scraped_data, tool_call_id=tool_call['id']))
 
-    # Execute the scraping tool
-    scraped_data = scrape_website_content.invoke(tool_call['args'])
+        # Step 3: Parse output into the structured inter-agent format
+        final_output: AgentMenuResponse = structured_llm.invoke(messages)
 
-    # Append tool output to context history
-    messages.append(ToolMessage(content=scraped_data, tool_call_id=tool_call['id']))
+        # Return as a native Python dict (or JSON string) for downstream agents
+        return final_output.model_dump()
 
-    # Pass the full context to the structured model
-    final_output: CompanyAnalysis = structured_llm.invoke(messages)
-
-    # 6. Access structured output directly as a Pydantic object or JSON
-    print("\n--- Parsed Pydantic Object ---")
-    print(f"Company: {final_output.company_name}")
-    print(f"Offering: {final_output.core_offering}")
-
-    print("\n--- Raw JSON Dump ---")
-    print(final_output.model_dump_json(indent=2))
+    return {
+        "query": incoming_query,
+        "direct_answer": "Failed to invoke scraping tool for context.",
+        "extracted_items": [],
+        "context_summary": ""
+    }
