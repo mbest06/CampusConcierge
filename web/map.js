@@ -23,14 +23,46 @@ function initMap() {
     gestureHandling: "greedy"
   });
 
-  new google.maps.Marker({
-    map,
-    position: VIRGINIA_TECH,
-    title: "Virginia Tech"
-  });
-
   // Available globally for future agent results and map markers.
   window.campusMap = map;
+
+  if (!navigator.geolocation) {
+    console.warn(
+      "CampusConcierge: geolocation is not supported. Using Virginia Tech."
+    );
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      const userLocation = {
+        lat: coords.latitude,
+        lng: coords.longitude
+      };
+
+      map.setCenter(userLocation);
+      map.setZoom(16);
+
+      window.userLocation = userLocation;
+      window.userLocationMarker = new google.maps.Marker({
+        map,
+        position: userLocation,
+        title: "Your location",
+        label: "You"
+      });
+    },
+    (error) => {
+      console.warn(
+        `CampusConcierge: location unavailable (${error.message}). Using Virginia Tech.`
+      );
+      // No marker is added when location access fails.
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 60000
+    }
+  );
 }
 
 // Called if the Google Maps script fails to load.
